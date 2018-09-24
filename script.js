@@ -31,11 +31,6 @@ if(argv.high < argv.low){
   process.exit(1);
 }
 
-// console.log('number=' + argv.n);
-// console.log('low=' + argv.l);
-// console.log('high=' + argv.h);
-// console.log('output=' + argv.o);
-
 const fs = require('fs');
 const randomNumberGenerator = require('random-number');
 var generateRandomNumber = randomNumberGenerator.generator({
