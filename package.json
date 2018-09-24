@@ -1,0 +1,24 @@
+{
+  "name": "numbergen",
+  "version": "1.0.0",
+  "description": "Generate random numbers to feed into number sort",
+  "main": "script.js",
+  "scripts": {
+    "start": "node script.js",
+    "test": "npm run test:lint && npm run test:unit",
+    "test:lint": "eslint .",
+    "test:unit": "istanbul cover _mocha $(find . -name '*.spec.js' -not -path './build/*' -not -path './node_modules/*')"
+  },
+  "author": "\"Alan Middleton\" <alanmiddleton@uk.ibm.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^5.6.0",
+    "eslint-plugin-mocha": "^5.2.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "random-number": "0.0.9",
+    "yargs": "^12.0.2"
+  }
+}
