@@ -93,6 +93,12 @@ function desiredFormat(format){
 // use {'flags': 'a'} to append and {'flags': 'w'} to erase and write a new file
 var logStream = fs.createWriteStream(argv.output, { flags: 'w' });
 for (var i = 0; i < argv.count; i++) {
+  if(i%10000 === 0){
+    // this is a big processing job, yield to free up resources
+    logStream.end();
+    console.log( i + ' of ' + argv.count + ' (' + ((i/argv.count)*100).toFixed(0) + '%)'); // eslint-disable-line no-console
+    logStream = fs.createWriteStream(argv.output, { flags: 'a' });
+  }
   var format = desiredFormat(argv.format)(); // evaluate this function for every loop
   if(format === 'pickle'){
     logStream.write('pickle\n');
@@ -100,4 +106,5 @@ for (var i = 0; i < argv.count; i++) {
     logStream.write(generateRandomNumber(null, null, format).toString() + '\n');
   }
 }
+console.log( 'Wrote ' + argv.count + ' numbers to ' + argv.output ); // eslint-disable-line no-console
 logStream.end();
