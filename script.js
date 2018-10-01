@@ -1,45 +1,15 @@
 'use strict';
 
-const argv = require('yargs')
-  .usage('Usage: $0 --count [num] --low [num] --high [num] --format [type] --output [file name]')
-  .usage(' or $0 -c [num] -l [num] -h [num] -f [type] -o [file name]')
-  .usage(' or npm start -- --count=[num] --low=[num] --high=[num] --format [type] --output [file name]')
-  .alias(
-    {
-      c: 'count',
-      l: 'low',
-      h: 'high',
-      f: 'format',
-      o: 'output'
-    }
-  )
-  .describe('f', 'format of the output numbers')
-  .choices('f', ['integer', 'decimal', 'random', 'pickle'])
-  .default(
-    {
-      'l': 0,
-      'o': './output.txt',
-      'f': 'integer'
-    }
-  )
-  .demandOption(['count','high'])
-  .argv;
-
-if(argv.count <= 0){
-  console.error('Incorrect usage: number (-count='+ argv.count +') must be greater than 0'); // eslint-disable-line no-console
-  process.exit(1);
-}
-
-if(argv.high < argv.low){
-  console.error('Incorrect usage: low (-low='+ argv.low +') must be less then high (-high='+ argv.high +')'); // eslint-disable-line no-console
-  process.exit(1);
-}
-
 const fs = require('fs');
 const randomNumberGenerator = require('random-number');
+
+const parameterParser = require('./src/helpers/cmd-parameters.js');
+
+let parameters = parameterParser.getCommandLineParams();
+
 var generateRandomNumber = randomNumberGenerator.generator({
-  min:  argv.l,
-  max:  argv.h,
+  min:  parameters.low,
+  max:  parameters.high,
   integer: true
 });
 
@@ -91,20 +61,20 @@ function desiredFormat(format){
 }
 
 // use {'flags': 'a'} to append and {'flags': 'w'} to erase and write a new file
-var logStream = fs.createWriteStream(argv.output, { flags: 'w' });
-for (var i = 0; i < argv.count; i++) {
+var logStream = fs.createWriteStream(parameters.output, { flags: 'w' });
+for (var i = 0; i < parameters.count; i++) {
   if(i%10000 === 0){
     // this is a big processing job, yield to free up resources
     logStream.end();
-    console.log( i + ' of ' + argv.count + ' (' + ((i/argv.count)*100).toFixed(0) + '%)'); // eslint-disable-line no-console
-    logStream = fs.createWriteStream(argv.output, { flags: 'a' });
+    console.log( i + ' of ' + parameters.count + ' (' + ((i/parameters.count)*100).toFixed(0) + '%)'); // eslint-disable-line no-console
+    logStream = fs.createWriteStream(parameters.output, { flags: 'a' });
   }
-  var format = desiredFormat(argv.format)(); // evaluate this function for every loop
+  var format = desiredFormat(parameters.format)(); // evaluate this function for every loop
   if(format === 'pickle'){
     logStream.write('pickle\n');
   } else {
     logStream.write(generateRandomNumber(null, null, format).toString() + '\n');
   }
 }
-console.log( 'Wrote ' + argv.count + ' numbers to ' + argv.output ); // eslint-disable-line no-console
+console.log( 'Wrote ' + parameters.count + ' numbers to ' + parameters.output ); // eslint-disable-line no-console
 logStream.end();
